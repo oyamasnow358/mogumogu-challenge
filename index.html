@@ -8,13 +8,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="もぐもぐ">
 <meta name="theme-color" content="#FFF8E7">
-<title>もぐもぐチャレンジ</title>
+<title>もぐもぐチャレンジ｜MieeL</title>
 <link rel="apple-touch-icon" id="touchIcon" href="">
 <style>
   /* ============================================================
      もぐもぐチャレンジ  見た目（CSS）
      ============================================================ */
   :root {
+    --mieel: radial-gradient(circle at 50% 0%,#1B8FE8 0%,#2BB8D6 28%,#3FCB9E 45%,#8FD24A 58%,#F4D027 72%,#F7941E 100%);
     --bg: #FFF8E7;
     --ink: #1F2937;
     --sub: #6B7280;
@@ -50,7 +51,20 @@
   }
   .chip .ic { font-size: 34px; line-height: 1; }
   .chip[hidden] { display: none; }
-  .brand { flex: 1; text-align: center; color: #C2B28E; font-size: 18px; letter-spacing: .15em; }
+  .brand { flex: 1; display: flex; justify-content: center; align-items: center; gap: 14px; color: #C2B28E; font-size: 16px; letter-spacing: .1em; }
+  /* ---------- MieeL ロゴ ---------- */
+  .mieel-brand { display: flex; align-items: center; gap: 7px; white-space: nowrap; flex: none; }
+  .orb-mini { width: 22px; height: 22px; border-radius: 50%; background: var(--mieel); flex: none; }
+  .mieel-brand strong { font-size: 16px; color: var(--ink); letter-spacing: .02em; }
+  .mieel-brand .url { font-size: 12px; color: var(--sub); font-weight: 600; }
+  .mieel-foot {
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid #E9ECEF;
+    text-align: center; color: var(--sub); font-size: 13px; line-height: 1.8;
+  }
+  .mieel-foot .mieel-brand { justify-content: center; }
+  .mieel-foot a { color: #1C7ED6; font-weight: 700; text-decoration: none; font-size: 14px; }
+  @media (max-width: 699px) { .topbar .mieel-brand .url { display: none; } }
+
   .gear {
     position: relative; width: 52px; height: 52px; border-radius: 50%; border: none;
     background: transparent; opacity: .35; font-size: 26px; display: grid; place-items: center;
@@ -384,7 +398,12 @@
 
 <header class="topbar">
   <button class="chip" id="whoChip" type="button" hidden></button>
-  <div class="brand">もぐもぐチャレンジ</div>
+  <div class="brand">
+    <div class="mieel-brand" aria-label="MieeL">
+      <span class="orb-mini"></span><strong>MieeL</strong><span class="url">mieel-support-school.com</span>
+    </div>
+    <span class="appname">もぐもぐチャレンジ</span>
+  </div>
   <button class="gear" id="gear" type="button" aria-label="先生用のせってい（ながおし）">⚙️</button>
 </header>
 <main id="view"></main>
@@ -1390,7 +1409,11 @@
         h('button', { type: 'button', class: 'btn ok', onclick: closeSettings }, 'とじる')),
       h('p', { class: 'note' }, 'この画面は 右上の ⚙️ を 1.5秒 ながおし すると ひらきます。変更は すぐに保存されます（この端末のみ）。'),
       h('div', null, abortSec, profileSec, missionSec, rewardSec, otherSec, stickerSec, backupSec),
-      h('div', { class: 'btns', style: 'margin-top:26px' }, h('button', { type: 'button', class: 'btn ok', onclick: closeSettings }, 'とじる')));
+      h('div', { class: 'btns', style: 'margin-top:26px' }, h('button', { type: 'button', class: 'btn ok', onclick: closeSettings }, 'とじる')),
+      h('div', { class: 'mieel-foot' },
+        h('div', { class: 'mieel-brand' }, h('span', { class: 'orb-mini' }), h('strong', null, 'MieeL'),
+          h('a', { href: 'https://www.mieel-support-school.com/', target: '_blank', rel: 'noopener' }, 'www.mieel-support-school.com')),
+        '© もぐもぐチャレンジ（特別支援教育向け）'));
   }
 
   function exportAll() {

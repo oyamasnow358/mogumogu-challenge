@@ -33,3 +33,7 @@ iPad の Safari で開くだけで使えます（ログイン・インストー�
 | ファイル | 役割 |
 |---|---|
 | `index.html` | アプリ本体（これ1つで動きます。効果音もプログラムで作るので音声ファイル不要） |
+
+---
+
+**MieeL** ― 特別支援教育の教材　[www.mieel-support-school.com](https://www.mieel-support-school.com/)
