@@ -227,6 +227,14 @@
   .play-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .undo { position: relative; border: none; background: transparent; font-size: 17px; padding: 12px 14px; opacity: .45; border-radius: 12px; }
   .undo.pressing { opacity: 1; background: #fff; }
+  .foot-l { display: flex; align-items: center; gap: 4px; }
+  .quit { position: relative; overflow: hidden; border: 2px solid #DEE2E6; background: #fff; color: #868E96; font-size: 16px; font-weight: 700; padding: 10px 14px; border-radius: 999px; -webkit-user-select: none; user-select: none; touch-action: none; }
+  .quit i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #FFE3E3; z-index: 0; }
+  .quit span { position: relative; z-index: 1; }
+  .quit.pressing { color: #E03131; border-color: #FFA8A8; }
+  .quit.pressing i { width: 100%; transition: width 1.5s linear; }
+  .stopped .stop-face { font-size: clamp(80px, 14vw, 150px); line-height: 1; }
+  .stopped h1 { color: var(--main-d, #1971C2) !important; font-size: clamp(40px, 6vw, 72px) !important; }
   .reward-mini {
     display: flex; align-items: center; gap: 8px; font-size: 20px; background: #fff;
     border: 3px dashed var(--pink); border-radius: 999px; padding: 4px 18px 4px 6px;
@@ -1100,11 +1108,37 @@
       h('div', { class: 'mission-bar' }, h('div', { class: 'mtext', id: 'mtext' }), h('div', { class: 'remain', id: 'remain' })),
       h('div', { class: 'track', id: 'track' }, stops, h('span', { class: 'runner', id: 'runner' }, S().character)),
       h('div', { class: 'play-main' }, h('div', { class: 'food-card', id: 'foodCard' }), biteBtn),
-      h('div', { class: 'play-foot' }, undo,
+      h('div', { class: 'play-foot' }, h('div', { class: 'foot-l' }, quitBtn(), undo),
         session.reward ? h('div', { class: 'reward-mini' }, makePic(session.reward), 'ごほうび：' + session.reward.name) : h('span'))
     ]);
     updatePlay(false);
     lock(500);
+  }
+
+  // とちゅうで おわる（1.5秒 ながおし。うっかり タッチでは おわらない）
+  function quitBtn() {
+    const b = h('button', { type: 'button', class: 'quit', 'aria-label': 'とちゅうで おわる（ながおし）' }, h('i'), h('span', null, '✕ おわる（ながおし）'));
+    let t = null;
+    const cancel = () => { clearTimeout(t); t = null; b.classList.remove('pressing'); };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('pressing'); t = setTimeout(() => { cancel(); quitSession(); }, 1500); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, cancel));
+    b.addEventListener('contextmenu', e => e.preventDefault());
+    return b;
+  }
+  function quitSession() {
+    if (!session) return finish();
+    const done = session.done || 0;
+    session = null; saveSession(); releaseWake();
+    screen = 'stopped'; updateChip(); sfx.tap();
+    setView('goal stopped', [
+      h('div', { class: 'stop-face' }, S().character),
+      h('h1', null, 'きょうは ここまで'),
+      h('div', { class: 'sub' }, done > 0 ? done + 'こ できたね。また やろうね！' : 'また こんど やろうね！'),
+      h('div', { class: 'actions' },
+        h('button', { type: 'button', class: 'big-btn go', onclick: () => { if (tapOk(600)) { sfx.tap(); finish(); } } }, '🏠 もどる'))
+    ]);
+    speak(done > 0 ? 'きょうは ここまで。' + done + 'こ できたね。' : 'きょうは ここまで。また やろうね。');
+    lock(800);
   }
 
   function updatePlay(animate) {
@@ -1303,7 +1337,7 @@
     if (screen === 'play' && session) renderPlay();
     else if (screen === 'who') renderWho();
     else if (screen === 'book') renderBook();
-    else if (screen === 'goal') { /* そのまま */ }
+    else if (screen === 'goal' || screen === 'stopped') { /* そのまま */ }
     else renderStart();
   }
   function refresh() {
